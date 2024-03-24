@@ -45,6 +45,7 @@ public class SynchronizedCache implements Cache {
 
   @Override
   public synchronized Object getObject(Object key) {
+    // 嵌套调用org.apache.ibatis.cache.decorators.LoggingCache.getObject
     return delegate.getObject(key);
   }
 

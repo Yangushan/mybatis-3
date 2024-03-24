@@ -21,6 +21,7 @@ import java.util.LinkedList;
 import org.apache.ibatis.cache.Cache;
 
 /**
+ * 先进先出，插入放在最后，先把head拿出去
  * FIFO (first in, first out) cache decorator.
  *
  * @author Clinton Begin
@@ -75,6 +76,7 @@ public class FifoCache implements Cache {
   }
 
   private void cycleKeyList(Object key) {
+    // 放入到最后面，移除最前面
     keyList.addLast(key);
     if (keyList.size() > size) {
       Object oldestKey = keyList.removeFirst();

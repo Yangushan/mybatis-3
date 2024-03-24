@@ -21,6 +21,8 @@ import java.util.Map;
 import org.apache.ibatis.cache.Cache;
 
 /**
+ * 内部使用了LinkedHashMap，每次get的时候把数据放入到map尾部
+ * 然后如果数据满了，则移除Head元素，也就是一直没有使用的元素，head元素也是最早放入的元素
  * Lru (least recently used) cache decorator.
  *
  * @author Clinton Begin
@@ -31,6 +33,7 @@ public class LruCache implements Cache {
   private Map<Object, Object> keyMap;
   private Object eldestKey;
 
+  // 设置长度
   public LruCache(Cache delegate) {
     this.delegate = delegate;
     setSize(1024);
@@ -70,6 +73,7 @@ public class LruCache implements Cache {
   @Override
   public Object getObject(Object key) {
     keyMap.get(key); // touch
+    // 这里继续嵌套调用org.apache.ibatis.cache.impl.PerpetualCache.getObject
     return delegate.getObject(key);
   }
 

@@ -60,6 +60,7 @@ public class SerializedCache implements Cache {
 
   @Override
   public Object getObject(Object key) {
+    // 这里继续嵌套调用org.apache.ibatis.cache.decorators.LruCache.getObject
     Object object = delegate.getObject(key);
     return object == null ? null : deserialize((byte[]) object);
   }

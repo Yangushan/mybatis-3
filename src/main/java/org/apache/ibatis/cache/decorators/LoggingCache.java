@@ -52,6 +52,7 @@ public class LoggingCache implements Cache {
   @Override
   public Object getObject(Object key) {
     requests++;
+    // 这里调用org.apache.ibatis.cache.decorators.SerializedCache.getObject
     final Object value = delegate.getObject(key);
     if (value != null) {
       hits++;

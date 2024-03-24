@@ -63,6 +63,7 @@ public class XMLStatementBuilder extends BaseBuilder {
       return;
     }
 
+    // 解析各种参数
     String nodeName = context.getNode().getNodeName();
     SqlCommandType sqlCommandType = SqlCommandType.valueOf(nodeName.toUpperCase(Locale.ENGLISH));
     boolean isSelect = sqlCommandType == SqlCommandType.SELECT;
@@ -95,6 +96,8 @@ public class XMLStatementBuilder extends BaseBuilder {
               ? Jdbc3KeyGenerator.INSTANCE : NoKeyGenerator.INSTANCE;
     }
 
+    // 解析sql得到SqlSource
+    // (静态动态，在执行sql的时候生成真正的sql，动态是指比如（$需要拼接，和我们的一些参数条件比较where if等）)
     SqlSource sqlSource = langDriver.createSqlSource(configuration, context, parameterTypeClass);
     StatementType statementType = StatementType
         .valueOf(context.getStringAttribute("statementType", StatementType.PREPARED.toString()));

@@ -111,23 +111,38 @@ public class XMLConfigBuilder extends BaseBuilder {
     return configuration;
   }
 
+  /**
+   * 解析配置文件
+   * @param root
+   */
   private void parseConfiguration(XNode root) {
     try {
       // issue #117 read properties first
       propertiesElement(root.evalNode("properties"));
+      // 解析我们的settings配置
       Properties settings = settingsAsProperties(root.evalNode("settings"));
       loadCustomVfsImpl(settings);
+      // 日志实现
       loadCustomLogImpl(settings);
+      // 解析别名，有默认的一些别名配置了
       typeAliasesElement(root.evalNode("typeAliases"));
+      // 注册插件，加入到interceptorChain里面
       pluginsElement(root.evalNode("plugins"));
+
       objectFactoryElement(root.evalNode("objectFactory"));
       objectWrapperFactoryElement(root.evalNode("objectWrapperFactory"));
       reflectorFactoryElement(root.evalNode("reflectorFactory"));
+
+      // 设置settings，没有设置使用默认值
       settingsElement(settings);
       // read it after objectFactory and objectWrapperFactory issue #631
+
+      // 读取环境的一些信息，数据库配置等
       environmentsElement(root.evalNode("environments"));
       databaseIdProviderElement(root.evalNode("databaseIdProvider"));
+      // 类型处理器
       typeHandlersElement(root.evalNode("typeHandlers"));
+      // 解析mapper
       mappersElement(root.evalNode("mappers"));
     } catch (Exception e) {
       throw new BuilderException("Error parsing SQL Mapper Configuration. Cause: " + e, e);
@@ -195,6 +210,11 @@ public class XMLConfigBuilder extends BaseBuilder {
     }
   }
 
+  /**
+   * 注册插件，加入到interceptorChain中
+   * @param context
+   * @throws Exception
+   */
   private void pluginsElement(XNode context) throws Exception {
     if (context != null) {
       for (XNode child : context.getChildren()) {
@@ -305,7 +325,9 @@ public class XMLConfigBuilder extends BaseBuilder {
     for (XNode child : context.getChildren()) {
       String id = child.getStringAttribute("id");
       if (isSpecifiedEnvironment(id)) {
+        // 事务
         TransactionFactory txFactory = transactionManagerElement(child.evalNode("transactionManager"));
+        // 数据源
         DataSourceFactory dsFactory = dataSourceElement(child.evalNode("dataSource"));
         DataSource dataSource = dsFactory.getDataSource();
         Environment.Builder environmentBuilder = new Environment.Builder(id).transactionFactory(txFactory)
@@ -386,12 +408,17 @@ public class XMLConfigBuilder extends BaseBuilder {
     }
   }
 
+  /**
+   * 解析mapper文件
+   * @param context
+   * @throws Exception
+   */
   private void mappersElement(XNode context) throws Exception {
     if (context == null) {
       return;
     }
     for (XNode child : context.getChildren()) {
-      if ("package".equals(child.getName())) {
+      if ("package".equals(child.getName())) { // 如果指定了package解析package
         String mapperPackage = child.getStringAttribute("name");
         configuration.addMappers(mapperPackage);
       } else {

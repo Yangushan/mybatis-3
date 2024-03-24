@@ -91,14 +91,17 @@ public class CacheBuilder {
 
   public Cache build() {
     setDefaultImplementations();
+    // 拿到默认的PerpetualCache类
     Cache cache = newBaseCacheInstance(implementation, id);
     setCacheProperties(cache);
     // issue #352, do not apply decorators to custom caches
     if (PerpetualCache.class.equals(cache.getClass())) {
+      // 拿到包装类，进行包装返回，目前只有一个Lru
       for (Class<? extends Cache> decorator : decorators) {
         cache = newCacheDecoratorInstance(decorator, cache);
         setCacheProperties(cache);
       }
+      // 设置一些基础的包装功能，注意这个cache是一层包一层
       cache = setStandardDecorators(cache);
     } else if (!LoggingCache.class.isAssignableFrom(cache.getClass())) {
       cache = new LoggingCache(cache);
@@ -125,14 +128,18 @@ public class CacheBuilder {
         cache = new ScheduledCache(cache);
         ((ScheduledCache) cache).setClearInterval(clearInterval);
       }
+      // 序列化
       if (readWrite) {
         cache = new SerializedCache(cache);
       }
+      // 又把上面包装好的再次进行日志包装
       cache = new LoggingCache(cache);
+      // 继续把上面的对象继续包装，一层嵌套一层，同步锁
       cache = new SynchronizedCache(cache);
       if (blocking) {
         cache = new BlockingCache(cache);
       }
+      // 最后返回嵌套包装的cache
       return cache;
     } catch (Exception e) {
       throw new CacheException("Error building standard cache decorators.  Cause: " + e, e);

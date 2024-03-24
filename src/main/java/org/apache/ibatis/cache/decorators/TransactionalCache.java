@@ -64,6 +64,8 @@ public class TransactionalCache implements Cache {
   @Override
   public Object getObject(Object key) {
     // issue #116
+    // 因为这个对象是嵌套，所以里面会从嵌套一层层出去
+    // 先是org.apache.ibatis.cache.decorators.SynchronizedCache.getObject
     Object object = delegate.getObject(key);
     if (object == null) {
       entriesMissedInCache.add(key);

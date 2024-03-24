@@ -713,6 +713,7 @@ public class Configuration {
       Object parameterObject, RowBounds rowBounds, ResultHandler resultHandler, BoundSql boundSql) {
     StatementHandler statementHandler = new RoutingStatementHandler(executor, mappedStatement, parameterObject,
         rowBounds, resultHandler, boundSql);
+    // 插件创建动态代理
     return (StatementHandler) interceptorChain.pluginAll(statementHandler);
   }
 
@@ -733,6 +734,7 @@ public class Configuration {
     if (cacheEnabled) {
       executor = new CachingExecutor(executor);
     }
+    // 通过调用我们拦截器的包装返回executor代理对象
     return (Executor) interceptorChain.pluginAll(executor);
   }
 
