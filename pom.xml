@@ -29,6 +29,7 @@
   <groupId>org.mybatis</groupId>
   <artifactId>mybatis</artifactId>
   <version>3.5.15</version>
+  <packaging>pom</packaging>
 
   <name>mybatis</name>
   <description>The MyBatis SQL mapper framework makes it easier to use a relational database with object-oriented
@@ -105,6 +106,9 @@
       <email>neuberg@m-atelier.cz</email>
     </contributor>
   </contributors>
+  <modules>
+    <module>yangushan-test</module>
+  </modules>
 
   <scm>
     <connection>scm:git:ssh://git@github.com/mybatis/mybatis-3.git</connection>
